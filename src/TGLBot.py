@@ -3,9 +3,11 @@ import json
 
 class TGLBot():
     def __init__(self):
-        self.irc = None
         self.BOT = None
         self.CHANNEL = None
+
+        self.irc = socket.socket()
+
         try:
             self.connect_bot()
         except:
@@ -21,8 +23,7 @@ class TGLBot():
                 self.BOT = d["BOT"]
                 self.CHANNEL = d["CHANNEL"]
                 OWNER = d["OWNER"]
-        
-        self.irc = socket.socket()
+
         self.irc.connect((SERVER, PORT))
         self.irc.send((f"PASS {PASS}\n\
                   NICK {self.BOT}\n\
