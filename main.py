@@ -1,12 +1,17 @@
-from src.TGLBot import TGLBot
-from src.pi_module import RaspPi
-
 import sys
+import platform
+
+if platform.system() == 'Windows':
+    from src.TGLBot import TGLBot
+else:
+    from src.TGLBot import TGLBot
+    from src.pi_module import RaspPi
 
 class TwitchGameOfLife():
     def __init__(self):
         self.tgl_bot = TGLBot()
-        self.pi = RaspPi()
+        if platform.system() != 'Windows':
+            self.pi = RaspPi()
 
     def run(self):
         command = self.pi.get_commands()
@@ -16,6 +21,12 @@ class TwitchGameOfLife():
                 read = self.tgl_bot.irc.recv(1024).decode()
             except:
                 read = ''
+
+            if(elapsed_timer(oldtime)):
+                oldtime = 
+                viewers = self.tgl_bot.get_viewers()
+                for each in viewers:
+                    print(f'Add 10 points to {each}.')
 
             for line in read.split("\r\n"):
                 if line == '':
@@ -35,6 +46,8 @@ class TwitchGameOfLife():
 
 if __name__ == "__main__":
     TGL = TwitchGameOfLife()
+    TGL.tgl_bot.get_viewers()
+    sys.exit()
 
     TGL.tgl_bot.join_chat()
     TGL.run()
