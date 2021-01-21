@@ -8,20 +8,22 @@ class TGLBot():
     Initialize attempts to connect to a non-blocking IRC channel with
     src/config parameters. If there is an error connecting verify the config
     file is setup correctly.
-
-    Noteable Variables
-    ---------------------------------------------
-    BOT - None
-    Bot name from config file.
-
-    CHANNEL - None
-    Channel name from config file.
-
-    irc - socket()
-    Socket object with connection to Twitch Channel.
-    ---------------------------------------------
     '''
     def __init__(self):
+        '''__init__()
+
+        Noteable Variables
+        ---------------------------------------------
+        BOT - None
+        Bot name from config file.
+
+        CHANNEL - None
+        Channel name from config file.
+
+        irc - socket()
+        Socket object with connection to Twitch Channel.
+        ---------------------------------------------
+        '''
         self.BOT = None
         self.CHANNEL = None
 
@@ -68,14 +70,17 @@ class TGLBot():
 
         self.irc.connect((SERVER, PORT))
         self.irc.send((f"PASS {PASS}\n\
-                  NICK {self.BOT}\n\
-                  JOIN #{self.CHANNEL}\n").encode())
-    
+                        NICK {self.BOT}\n\
+                        JOIN #{self.CHANNEL}\n").encode())
+
     def join_chat(self):
         '''join_chat()
+        Join chat room and wait until end configuration messages are complete.
 
         Noteable Variables
         ---------------------------------------------
+        buffer_join - bit
+        Information retrieved from twitch to be parsed.
         ---------------------------------------------
         '''
         done = False
@@ -90,43 +95,70 @@ class TGLBot():
                     done = True
 
     def send_message(self, message):
-        '''
+        '''send_message(message)
+        Send message to channel.
+
         Noteable Variables
         ---------------------------------------------
+        message_temp - str
+        Information header needed to send to channel.
+
+        message - str
+        Information to send to channel appended to message_temp.
         ---------------------------------------------
         '''
         message_temp = f"PRIVMSG #{self.CHANNEL} :"
         self.irc.send((message_temp + message + '\n').encode())
 
     def get_message(self, message):
-        '''
+        '''get_message(message)
+        Message retrieved from twitch irc channel message.
+
         Noteable Variables
         ---------------------------------------------
+        line - str
+        Attempt to split message from an input message. If no message available
+        return empty str.
         ---------------------------------------------
         '''
         try:
             line = (message.split(":",2))[2]
         except:
             line = ""
+
         return line
 
     def get_user(self, message):
-        '''
+        '''get_user(message)
+        Username retrieved from twitch irc channel message.
+
         Noteable Variables
         ---------------------------------------------
+        user - str
+        Attempt to extract username information from twitch irc message if
+        none available return empty str.
         ---------------------------------------------
         '''
-        temp = message.split(':',1)
-        user = temp[1].split('!',1)[0]
+        try:
+            temp = message.split(':',1)
+            user = temp[1].split('!',1)[0]
+        except:
+            user = ""
+
         return user
 
     def get_viewers(self):
-        '''
+        '''get_viewers()
+        Get all listed viewers in a set viewlist.
+
         Noteable Variables
         ---------------------------------------------
+        data - json
+        Json object from requested site tmi.twitch.tv.
         ---------------------------------------------
         '''
         req = requests.get(
         'http://tmi.twitch.tv/group/user/draftjoker/chatters')
         data = json.loads(req.content.decode('utf-8'))
+
         return data['chatters']['viewers']
