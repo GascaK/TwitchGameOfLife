@@ -3,13 +3,23 @@ import time
 
 class RaspPi():
     def __init__(self, warning = False):
-        self.commands = ['WATER', 'FOOD', 'LIGHTS', 'CAMERA']
+        self.commands = {
+            'COMMANDS': ['WATER',
+                         'FOOD',
+                         'LIGHTS',
+                         'CAMERA'],
+            'WATER': 1000,
+            'FOOD': 3000,
+            'LIGHTS': 300,
+            'CAMERA': 2000,
+        }
+
         GPIO.setmode(GPIO.BOARD)
         GPIO.setwarnings(warning)
 
-    def command_list(self, command):
-        if command == "WATER":
-            print("Watering ants.")
+    def command_controller(self, command):
+        if command == "!WATER":
+            print("Watering Hercules.")
             cm_water(5)
         elif command == "FOOD":
             print("Feeding ants.")

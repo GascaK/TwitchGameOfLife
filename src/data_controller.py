@@ -10,6 +10,23 @@ class DataController:
             self.con = sqlite3.connect(":memory:")
 
         self.c = self.con.cursor()
+        self.command_list = ['!POINTS']
+
+    def command_controller(self, command, *args):
+        '''command_controller(command, *args)
+        Activate certain commands available in DataController.
+
+        Noteable Variables
+        ---------------------------------------------
+        command - str
+        Command to be executed.
+
+        *args - Variable non keyword argument
+        Information needed to execute command.
+        ---------------------------------------------
+        '''
+        if(command == '!POINTS'):
+            return self.get_points(args[0])
 
     def create_table(self, table_name):
         '''create_table(table_name)
@@ -97,6 +114,27 @@ class DataController:
         
         #return self.con.rowcount()
 
+    def get_points(self, viewer):
+        '''get_points(viewer)
+        Get available points for user.
+
+        Noteable Variables
+        ---------------------------------------------
+        viewer - str
+        Viewer to be retrieved.
+        ---------------------------------------------
+
+        returns entry['POINTS']
+        '''
+        self.c.execute('''SELECT * FROM viewers
+        WHERE ID = ?''',(viewer,))
+        entry = self.c.fetchone()
+
+        if entry is not None:
+            return entry[1], f'{entry[1]} points avaiable to spend!'
+        else:
+            return 0, 'Unable to locate.'
+
     def get_user(self, viewer):
         '''get_user(viewer)
         Get viewer information from db.
@@ -109,9 +147,17 @@ class DataController:
 
         returns cursor . fetchone()
         '''
-        self.c.exectute(f'''SELECT * FROM viewers
+        self.c.execute(f'''SELECT * FROM viewers
         WHERE ID = ?''',(viewer,))
         return self.c.fetchone()
+
+    def get_commands(self):
+        '''get_commands()
+        Returns the command list available.
+
+        returns command_list
+        '''
+        return self.command_list
 
     def spend_points(self, viewer, amount):
         '''spend_points(viewer, amount)
@@ -125,17 +171,15 @@ class DataController:
         amount - int
         Amount of points to be subtracted.
         ---------------------------------------------
-
-        returns connection . total_changes()
         '''
         self.c.execute(f'''SELECT * FROM viewers
         WHERE ID = ?''',(viewer,))
 
         entry = self.c.fetchone()
 
-        if entry is not None:
+        if entry is not None and (entry[1] - amount >= 0):
             self.c.execute(f'''UPDATE viewers SET points = ?
             WHERE ID = ?''',(entry[1]-amount, viewer,))
-        
-        self.con.commit()
-        #return self.con.changes()
+            self.con.commit()
+        else:
+            print('Unable to spend points')

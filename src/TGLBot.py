@@ -22,6 +22,9 @@ class TGLBot():
 
         irc - socket()
         Socket object with connection to Twitch Channel.
+
+        command_list - list
+        Commands available to viewers.
         ---------------------------------------------
         '''
         self.BOT = None
@@ -33,6 +36,8 @@ class TGLBot():
             self.connect_bot()
         except:
             print('Unable to Connect')
+
+        self.command_list = []
         
     def connect_bot(self):
         '''connect_bot()
@@ -120,6 +125,8 @@ class TGLBot():
         Attempt to split message from an input message. If no message available
         return empty str.
         ---------------------------------------------
+
+        returns message split
         '''
         try:
             line = (message.split(":",2))[2]
@@ -138,6 +145,8 @@ class TGLBot():
         Attempt to extract username information from twitch irc message if
         none available return empty str.
         ---------------------------------------------
+
+        returns user
         '''
         try:
             temp = message.split(':',1)
@@ -156,9 +165,26 @@ class TGLBot():
         data - json
         Json object from requested site tmi.twitch.tv.
         ---------------------------------------------
+
+        returns viewers list or None on err
         '''
         req = requests.get(
         'http://tmi.twitch.tv/group/user/draftjoker/chatters')
-        data = json.loads(req.content.decode('utf-8'))
+        #data = json.loads(req.content.decode('utf-8'))
+        try:
+            data = req.json()
+            return data['chatters']['viewers']
+        except:
+            return None
 
-        return data['chatters']['viewers']
+    def get_commands(self):
+        '''get_commands()
+        Return command list.
+
+        Noteable Variables
+        ---------------------------------------------
+        ---------------------------------------------
+
+        returns command_list
+        '''
+        return self.command_list
